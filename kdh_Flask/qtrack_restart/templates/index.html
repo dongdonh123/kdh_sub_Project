@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>큐트랙서버 재기동</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+  <h1>큐트랙서버 상태확인</h1>
+  <form id="statusCommandForm">
+    <input type="hidden" name="command" value="ps -ef | grep tomcat">
+    <button type="submit">Check Q-Track server status </button>
+  </form>
+  <pre id="output2"></pre>
+
+  <script>
+    $(document).ready(function(){
+      $('#statusCommandForm').on('submit', function(e){
+        e.preventDefault();
+        $.ajax({
+          url: '/run-status-command',
+          type: 'POST',
+          data: $(this).serialize(),
+          success: function(response){
+            $('#output2').text(response.output2);
+          }
+        });
+      });
+    });
+  </script>
+
+<h1>큐트랙서버 중지</h1>
+<form id="killCommandForm">
+  <input type="hidden" name="command" value="sh /home/kdh/my_flask_app/qtrack_kill.sh">
+  <button type="submit">Kill Q-Track server</button>
+</form>
+<pre id="output"></pre>
+
+<script>
+  $(document).ready(function(){
+    $('#killCommandForm').on('submit', function(e){
+      e.preventDefault();
+      $.ajax({
+        url: '/run-kill-command',
+        type: 'POST',
+        data: $(this).serialize(),
+        success: function(response){
+          $('#output').text(response.output);
+        }
+      });
+    });
+  });
+</script>
+
+<h1>큐트랙서버 구동</h1>
+<form id="startCommandForm">
+  <input type="hidden" name="command" value="sh /home/kdh/my_flask_app/qtrack_start.sh">
+  <button type="submit">Start Q-Track server</button>
+</form>
+<pre id="output3"></pre>
+
+<script>
+  $(document).ready(function(){
+    $('#startCommandForm').on('submit', function(e){
+      e.preventDefault();
+      $.ajax({
+        url: '/run-start-command',
+        type: 'POST',
+        data: $(this).serialize(),
+        success: function(response){
+          $('#output3').text(response.output3);
+        }
+      });
+    });
+  });
+</script>
+
+</body>
+</html>

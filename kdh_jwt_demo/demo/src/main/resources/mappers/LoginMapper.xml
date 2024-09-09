@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.mapper.LoginMapper">
+
+    <resultMap id="UserResultMap" type="com.example.demo.model.UserDTO">
+        <id property="user_id" column="user_id"/>
+        <result property="user_passwd" column="user_passwd"/>
+        <result property="user_role" column="user_role"/>
+    </resultMap>
+
+    <select id="findUserName" parameterType="String" resultMap="UserResultMap">
+        SELECT
+        user_id,
+        user_passwd,
+        user_role
+        FROM kdh.user_mgt
+        where user_id = #{username};
+    </select>
+
+
+</mapper>
