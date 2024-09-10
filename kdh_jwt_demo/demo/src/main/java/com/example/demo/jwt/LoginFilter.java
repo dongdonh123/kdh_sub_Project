@@ -1,7 +1,9 @@
 package com.example.demo.jwt;
 
 import com.example.demo.model.LoginDTO;
+import com.example.demo.model.TokenDTO;
 import com.example.demo.service.LoginService;
+import com.example.demo.service.TokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,17 +18,20 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
     private final JWTUtil jwtUtil;
+    private final TokenService tokenService;
 
-    public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil) {
+    public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil, TokenService tokenService) {
 
         this.authenticationManager = authenticationManager;
         this.jwtUtil =  jwtUtil;
+        this.tokenService = tokenService;
     }
 
     @Override
@@ -60,6 +65,9 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String access = jwtUtil.createJwt("access", username, role, 600000L); //10분
         String refresh = jwtUtil.createJwt("refresh", username, role, 86400000L); //24시간
 
+        //Refresh 토큰 저장
+        addRefreshEntity(username, refresh, 86400000L);
+
         //응답 설정
         response.setHeader("access", access);
         response.addCookie(createCookie("refresh", refresh));
@@ -84,6 +92,18 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         cookie.setHttpOnly(true);
 
         return cookie;
+    }
+
+    private void addRefreshEntity(String username, String refresh, Long expiredMs) {
+
+        Date date = new Date(System.currentTimeMillis() + expiredMs);
+
+        TokenDTO tokenDTO = new TokenDTO();
+        tokenDTO.setUser_name(username);
+        tokenDTO.setRefresh(refresh);
+        tokenDTO.setExpiration(date.toString());
+
+        tokenService.saveToken(tokenDTO);
     }
 
 }
