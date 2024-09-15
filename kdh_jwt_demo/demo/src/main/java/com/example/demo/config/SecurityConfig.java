@@ -1,5 +1,6 @@
 package com.example.demo.config;
 
+import com.example.demo.jwt.CustomLogoutFilter;
 import com.example.demo.jwt.JWTFilter;
 import com.example.demo.jwt.JWTUtil;
 import com.example.demo.jwt.LoginFilter;
@@ -14,6 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 
 @Configuration  // 이클래스가 스프링부트한테 컨피규레이션 관리되기 위해서 어노테이션 선언
 @EnableWebSecurity // 이 컨피그레이션 클래스 자체는 시큐리티를 위한 컨피그 이기 떄문에 선언
@@ -78,6 +80,9 @@ public class SecurityConfig {
         http
                 .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration),jwtUtil, tokenService), UsernamePasswordAuthenticationFilter.class);
 
+
+        http
+                .addFilterBefore(new CustomLogoutFilter(jwtUtil, tokenService), LogoutFilter.class);
 
         //세션 설정
         http
